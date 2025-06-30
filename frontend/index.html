@@ -1,0 +1,41 @@
+// Crear usuario
+crearUsuarioBtn.addEventListener('click', async function () {
+    const nombre = nombreInput.value.trim();
+    const peso = parseFloat(pesoInput.value);
+
+    if (!validarNombre(nombre)) {
+        mostrarError('Por favor, ingrese un nombre válido.');
+        return;
+    }
+
+    if (!validarPeso(peso)) {
+        mostrarError('Por favor, ingrese un peso válido.');
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:8080/usuario/actualizar?nuevoNombre=${nombre}&nuevoPeso=${peso}`, {
+            method: 'POST'
+        });
+
+        const text = await response.text();
+        userData.textContent = text;
+        usuarioActual = { nombre, peso }; // Simula el objeto en JS
+        actualizarEstadoInterfaz();
+    } catch (error) {
+        mostrarError("No se pudo conectar con el backend.");
+    }
+});
+
+// Obtener usuario actual
+actualizarEstadoInterfaz = async function () {
+    try {
+        const response = await fetch(`http://localhost:8080/usuario`);
+        const text = await response.text();
+        userData.textContent = text;
+        infoDisplay.classList.add('active');
+        statusIndicator.classList.add('active');
+    } catch (error) {
+        mostrarError("Error al obtener datos del backend.");
+    }
+}

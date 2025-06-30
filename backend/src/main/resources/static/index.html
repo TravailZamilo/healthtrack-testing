@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Clase Usuario</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input:invalid {
+            border-color: #e74c3c;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .info-display {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            color: white;
+            text-align: center;
+            transform: scale(0);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0;
+        }
+
+        .info-display.active {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .info-display h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .info-display .user-data {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+            transform: translateY(-10px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .error-message.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #95a5a6;
+            transition: all 0.3s ease;
+        }
+
+        .status-indicator.active {
+            background: #2ecc71;
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-indicator" id="statusIndicator"></div>
+        
+        <div class="header">
+            <h1>Simulador de Clase Usuario</h1>
+            <p>Implementación frontend de la clase Java Usuario</p>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <div class="form-section">
+            <div class="form-group">
+                <label for="nombreInput">Nombre del Usuario</label>
+                <input type="text" id="nombreInput" placeholder="Ingrese el nombre del usuario" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="pesoInput">Peso Inicial (kg)</label>
+                <input type="number" id="pesoInput" placeholder="Ingrese el peso en kilogramos" step="0.1" min="0" required>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-primary" id="crearUsuarioBtn">Crear Usuario</button>
+            <button class="btn btn-secondary" id="actualizarPesoBtn" disabled>Actualizar Peso</button>
+        </div>
+
+        <div id="infoDisplay" class="info-display">
+            <h3>Información del Usuario</h3>
+            <div class="user-data" id="userData"></div>
+        </div>
+    </div>
+
+    <script>
+        // Simulación de la clase Usuario de Java
+        class Usuario {
+            constructor(nombre, peso) {
+                this.nombre = nombre;
+                this.peso = peso;
+            }
+
+            getNombre() {
+                return this.nombre;
+            }
+
+            getPeso() {
+                return this.peso;
+            }
+
+            actualizarPeso(nuevoPeso) {
+                this.peso = nuevoPeso;
+            }
+
+            mostrarInformacion() {
+                return `Usuario: ${this.nombre}, Peso: ${this.peso} kg`;
+            }
+        }
+
+        // Variables globales para el manejo de la aplicación
+        let usuarioActual = null;
+
+        // Referencias a elementos del DOM
+        const nombreInput = document.getElementById('nombreInput');
+        const pesoInput = document.getElementById('pesoInput');
+        const crearUsuarioBtn = document.getElementById('crearUsuarioBtn');
+        const actualizarPesoBtn = document.getElementById('actualizarPesoBtn');
+        const infoDisplay = document.getElementById('infoDisplay');
+        const userData = document.getElementById('userData');
+        const errorMessage = document.getElementById('errorMessage');
+        const statusIndicator = document.getElementById('statusIndicator');
+
+        // Funciones de utilidad
+        function mostrarError(mensaje) {
+            errorMessage.textContent = mensaje;
+            errorMessage.classList.add('show');
+            
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 3000);
+        }
+
+        function ocultarError() {
+            errorMessage.classList.remove('show');
+        }
+
+        function validarNombre(nombre) {
+            return nombre && nombre.trim().length > 0;
+        }
+
+        function validarPeso(peso) {
+            return !isNaN(peso) && peso > 0;
+        }
+
+        function actualizarEstadoInterfaz() {
+            if (usuarioActual) {
+                actualizarPesoBtn.disabled = false;
+                statusIndicator.classList.add('active');
+                infoDisplay.classList.add('active');
+                userData.textContent = usuarioActual.mostrarInformacion();
+            } else {
+                actualizarPesoBtn.disabled = true;
+                statusIndicator.classList.remove('active');
+                infoDisplay.classList.remove('active');
+            }
+        }
+
+        function limpiarFormulario() {
+            nombreInput.value = '';
+            pesoInput.value = '';
+        }
+
+        // Event Listeners
+        crearUsuarioBtn.addEventListener('click', function() {
+            const nombre = nombreInput.value.trim();
+            const peso = parseFloat(pesoInput.value);
+
+            // Validaciones
+            if (!validarNombre(nombre)) {
+                mostrarError('Por favor, ingrese un nombre válido.');
+                nombreInput.focus();
+                return;
+            }
+
+            if (!validarPeso(peso)) {
+                mostrarError('Por favor, ingrese un peso válido mayor a 0.');
+                pesoInput.focus();
+                return;
+            }
+
+            ocultarError();
+
+            // Crear nueva instancia de Usuario
+            usuarioActual = new Usuario(nombre, peso);
+            
+            // Actualizar la interfaz
+            actualizarEstadoInterfaz();
+            limpiarFormulario();
+
+            // Animación de éxito
+            crearUsuarioBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                crearUsuarioBtn.style.transform = 'scale(1)';
+            }, 150);
+        });
+
+        actualizarPesoBtn.addEventListener('click', function() {
+            if (!usuarioActual) {
+                mostrarError('Primero debe crear un usuario.');
+                return;
+            }
+
+            const nuevoPeso = prompt('Ingrese el nuevo peso (kg):');
+            
+            if (nuevoPeso === null) {
+                // Usuario canceló
+                return;
+            }
+
+            const pesoNumerico = parseFloat(nuevoPeso);
+            
+            if (!validarPeso(pesoNumerico)) {
+                mostrarError('Por favor, ingrese un peso válido mayor a 0.');
+                return;
+            }
+
+            ocultarError();
+
+            // Actualizar peso del usuario
+            usuarioActual.actualizarPeso(pesoNumerico);
+            
+            // Actualizar la interfaz
+            actualizarEstadoInterfaz();
+
+            // Animación de éxito
+            actualizarPesoBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                actualizarPesoBtn.style.transform = 'scale(1)';
+            }, 150);
+        });
+
+        // Validación en tiempo real para mejorar UX
+        nombreInput.addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                this.style.borderColor = '#2ecc71';
+            } else {
+                this.style.borderColor = '#e1e8ed';
+            }
+        });
+
+        pesoInput.addEventListener('input', function() {
+            const peso = parseFloat(this.value);
+            if (validarPeso(peso)) {
+                this.style.borderColor = '#2ecc71';
+            } else {
+                this.style.borderColor = '#e1e8ed';
+            }
+        });
+
+        // Permitir crear usuario con Enter
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !actualizarPesoBtn.disabled) {
+                crearUsuarioBtn.click();
+            }
+        });
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarEstadoInterfaz();
+            nombreInput.focus();
+        });
+    </script>
+</body>
+</html>
